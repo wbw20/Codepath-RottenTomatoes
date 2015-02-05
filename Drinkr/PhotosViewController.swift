@@ -12,6 +12,7 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
 
     var photos: NSArray! = []
 
+    var refreshControl : UIRefreshControl!
 
     @IBOutlet var tableView: UITableView!
 
@@ -22,17 +23,10 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.delegate = self
         tableView.dataSource = self
 
-        var clientId = "ce1848d0d33e4833b0ca6beac05ac210"
-        
-        var url = NSURL(string: "https://api.instagram.com/v1/media/popular?client_id=\(clientId)")!
-        var request = NSURLRequest(URL: url)
-        NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue()) { (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
-            var responseDictionary = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: nil) as NSDictionary
-            self.photos = responseDictionary["data"] as NSArray
-
-            NSLog("%d", self.photos.count)
-            self.tableView.reloadData()
-        }
+        self.refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: "fetch:", forControlEvents: .ValueChanged)
+        tableView.insertSubview(refreshControl, atIndex: 0)
+        fetch(refreshControl)
         // Do any additional setup after loading the view.
     }
 
@@ -57,7 +51,19 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         
         return cell
     }
-    
+
+    func fetch(sender: UIRefreshControl) {
+        var clientId = "ce1848d0d33e4833b0ca6beac05ac210"
+        
+        var url = NSURL(string: "https://api.instagram.com/v1/media/popular?client_id=\(clientId)")!
+        var request = NSURLRequest(URL: url)
+        NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue()) { (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
+            var responseDictionary = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: nil) as NSDictionary
+            self.photos = responseDictionary["data"] as NSArray
+            
+            self.tableView.reloadData()
+        }
+    }
 
     // MARK: - Navigation
 
