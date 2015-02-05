@@ -24,7 +24,7 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.dataSource = self
 
         self.refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: "fetch:", forControlEvents: .ValueChanged)
+        refreshControl.addTarget(self, action: "refresh", forControlEvents: .ValueChanged)
         tableView.insertSubview(refreshControl, atIndex: 0)
         fetch(refreshControl)
         // Do any additional setup after loading the view.
@@ -52,7 +52,11 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
 
-    func fetch(sender: UIRefreshControl) {
+    func refresh(sender: UIRefreshControl) {
+        fetch(sender)
+    }
+
+    func fetch(sender: UIRefreshControl?, offset: NSInteger = 0) {
         var clientId = "ce1848d0d33e4833b0ca6beac05ac210"
         
         var url = NSURL(string: "https://api.instagram.com/v1/media/popular?client_id=\(clientId)")!
